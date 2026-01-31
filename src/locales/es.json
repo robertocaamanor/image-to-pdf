@@ -1,0 +1,22 @@
+{
+    "app": {
+        "title": "Convertidor de Imagen a PDF",
+        "subtitle": "Transforma tus imágenes en un documento PDF en segundos.",
+        "dropzone": {
+            "title": "Arrastra imágenes aquí",
+            "subtitle": "o haz clic para seleccionar archivos",
+            "supports": "Soporta: JPG, PNG, WEBP"
+        },
+        "actions": {
+            "generate": "Generar PDF",
+            "generating": "Generando...",
+            "clear": "Limpiar Todo",
+            "add_more": "Agregar Imágenes"
+        },
+        "footer": "Arrastra para reordenar • Calidad Premium",
+        "errors": {
+            "file_type": "Tipo de archivo inválido. Por favor sube imágenes.",
+            "too_many_files": "Demasiados archivos."
+        }
+    }
+}

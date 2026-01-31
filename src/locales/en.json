@@ -1,0 +1,22 @@
+{
+    "app": {
+        "title": "Image to PDF Converter",
+        "subtitle": "Transform your images into a PDF document in seconds.",
+        "dropzone": {
+            "title": "Drop images here",
+            "subtitle": "or click to select files",
+            "supports": "Supports: JPG, PNG, WEBP"
+        },
+        "actions": {
+            "generate": "Generate PDF",
+            "generating": "Generating...",
+            "clear": "Clear All",
+            "add_more": "Add Images"
+        },
+        "footer": "Drag to reorder • Premium Quality",
+        "errors": {
+            "file_type": "Invalid file type. Please upload images.",
+            "too_many_files": "Too many files."
+        }
+    }
+}
