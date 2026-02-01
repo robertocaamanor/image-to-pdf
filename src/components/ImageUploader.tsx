@@ -3,10 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Upload, Image as ImageIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 
-export function ImageUploader({ onImagesSelected }) {
+interface ImageUploaderProps {
+    onImagesSelected: (files: FileList) => void;
+}
+
+export function ImageUploader({ onImagesSelected }: ImageUploaderProps) {
     const { t } = useTranslation();
 
-    const handleDrop = useCallback((e) => {
+    const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -15,12 +19,12 @@ export function ImageUploader({ onImagesSelected }) {
         }
     }, [onImagesSelected]);
 
-    const handleDragOver = useCallback((e) => {
+    const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
     }, []);
 
-    const handleFileInput = (e) => {
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             onImagesSelected(e.target.files);
         }

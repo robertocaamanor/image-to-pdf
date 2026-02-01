@@ -1,4 +1,4 @@
-import React from 'react';
+
 import {
     DndContext,
     closestCenter,
@@ -6,7 +6,6 @@ import {
     PointerSensor,
     useSensor,
     useSensors,
-    DragOverlay,
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -14,9 +13,17 @@ import {
     sortableKeyboardCoordinates,
     rectSortingStrategy,
 } from '@dnd-kit/sortable';
+import { ImageItem } from '../types';
+import { DragEndEvent } from '@dnd-kit/core';
 import { SortableItem } from './SortableItem';
 
-export function SortableImageGrid({ images, onImagesReorder, onRemove }) {
+interface SortableImageGridProps {
+    images: ImageItem[];
+    onImagesReorder: (images: ImageItem[]) => void;
+    onRemove: (id: string) => void;
+}
+
+export function SortableImageGrid({ images, onImagesReorder, onRemove }: SortableImageGridProps) {
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -24,10 +31,10 @@ export function SortableImageGrid({ images, onImagesReorder, onRemove }) {
         })
     );
 
-    const handleDragEnd = (event) => {
+    const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
-        if (active.id !== over.id) {
+        if (over && active.id !== over.id) {
             const oldIndex = images.findIndex((item) => item.id === active.id);
             const newIndex = images.findIndex((item) => item.id === over.id);
 

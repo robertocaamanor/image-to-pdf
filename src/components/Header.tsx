@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText, Languages } from 'lucide-react';
 
-export function Header() {
+export function Header(): React.ReactElement {
     const { t, i18n } = useTranslation();
 
     const toggleLanguage = () => {

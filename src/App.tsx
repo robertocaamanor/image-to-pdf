@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
 import { ImageUploader } from './components/ImageUploader';
@@ -6,16 +6,18 @@ import { SortableImageGrid } from './components/SortableImageGrid';
 import { Header } from './components/Header';
 import { Loader2, Download, Trash2, Plus } from 'lucide-react';
 import { clsx } from 'clsx';
+import { ImageItem } from './types';
 
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 function App() {
   const { t } = useTranslation();
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<ImageItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleImagesSelected = (files) => {
+  const handleImagesSelected = (files: FileList | null) => {
+    if (!files) return;
     const newImages = Array.from(files).map((file) => ({
       id: generateId(),
       file,
@@ -24,7 +26,7 @@ function App() {
     setImages((prev) => [...prev, ...newImages]);
   };
 
-  const handleRemoveImage = (id) => {
+  const handleRemoveImage = (id: string) => {
     setImages((prev) => {
       const newImages = prev.filter((img) => img.id !== id);
       // Revoke URL to avoid memory leaks
@@ -36,7 +38,7 @@ function App() {
     });
   };
 
-  const handleReorder = (newImages) => {
+  const handleReorder = (newImages: ImageItem[]) => {
     setImages(newImages);
   };
 

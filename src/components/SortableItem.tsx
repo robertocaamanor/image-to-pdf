@@ -1,9 +1,15 @@
-import React from 'react';
+
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { X } from 'lucide-react';
 
-export function SortableItem({ id, src, onRemove }) {
+interface SortableItemProps {
+    id: string;
+    src: string;
+    onRemove: (id: string) => void;
+}
+
+export function SortableItem({ id, src, onRemove }: SortableItemProps) {
     const {
         attributes,
         listeners,
