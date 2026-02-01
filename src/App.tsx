@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 import { ImageUploader } from './components/ImageUploader';
 import { SortableImageGrid } from './components/SortableImageGrid';
 import { Header } from './components/Header';
@@ -15,6 +17,8 @@ function App() {
   const { t } = useTranslation();
   const [images, setImages] = useState<ImageItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const handleImagesSelected = (files: FileList | null) => {
     if (!files) return;
@@ -45,6 +49,14 @@ function App() {
   const handleClearAll = () => {
     images.forEach(img => URL.revokeObjectURL(img.src));
     setImages([]);
+  };
+
+  const handlePreview = (src: string) => {
+    const index = images.findIndex(img => img.src === src);
+    if (index >= 0) {
+      setLightboxIndex(index);
+      setLightboxOpen(true);
+    }
   };
 
   const generatePDF = async () => {
@@ -186,11 +198,22 @@ function App() {
                 images={images}
                 onImagesReorder={handleReorder}
                 onRemove={handleRemoveImage}
+                onPreview={handlePreview}
               />
             )}
           </div>
         </div>
       </main>
+
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={images.map(img => ({ src: img.src }))}
+        on={{
+          view: ({ index }) => setLightboxIndex(index),
+        }}
+      />
     </div>
   );
 }

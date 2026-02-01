@@ -21,11 +21,16 @@ interface SortableImageGridProps {
     images: ImageItem[];
     onImagesReorder: (images: ImageItem[]) => void;
     onRemove: (id: string) => void;
+    onPreview: (src: string) => void;
 }
 
-export function SortableImageGrid({ images, onImagesReorder, onRemove }: SortableImageGridProps) {
+export function SortableImageGrid({ images, onImagesReorder, onRemove, onPreview }: SortableImageGridProps) {
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -59,6 +64,7 @@ export function SortableImageGrid({ images, onImagesReorder, onRemove }: Sortabl
                             id={image.id}
                             src={image.src}
                             onRemove={onRemove}
+                            onPreview={onPreview}
                         />
                     ))}
                 </div>
