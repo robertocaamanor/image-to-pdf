@@ -17,6 +17,21 @@
         "errors": {
             "file_type": "Tipo de archivo inválido. Por favor sube imágenes.",
             "too_many_files": "Demasiados archivos."
+        },
+        "settings": {
+            "title": "Configuración del PDF",
+            "page_size": {
+                "label": "Tamaño de Página",
+                "a4": "A4",
+                "letter": "Carta (Letter)",
+                "fit": "Ajustar a la imagen (Sin márgenes)"
+            },
+            "margin": {
+                "label": "Márgenes",
+                "none": "Sin márgenes",
+                "small": "Pequeño (10mm)",
+                "medium": "Normal (20mm)"
+            }
         }
     }
 }

@@ -8,7 +8,8 @@ import { SortableImageGrid } from './components/SortableImageGrid';
 import { Header } from './components/Header';
 import { Loader2, Download, Trash2, Plus } from 'lucide-react';
 import { clsx } from 'clsx';
-import { ImageItem } from './types';
+import { PDFSettingsPanel } from './components/PDFSettingsPanel';
+import { ImageItem, PDFSettings } from './types';
 
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -19,6 +20,10 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [pdfSettings, setPdfSettings] = useState<PDFSettings>({
+    pageSize: 'a4',
+    margin: 'small'
+  });
 
   const handleImagesSelected = (files: FileList | null) => {
     if (!files) return;
@@ -68,7 +73,14 @@ function App() {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        format: pdfSettings.pageSize === 'fit' ? 'a4' : pdfSettings.pageSize, // Initial format, will be overridden for fit
+        unit: 'mm'
+      });
+
+      // Clear initial page created by constructor if we are going to manage pages manually loop
+      // Actually jsPDF creates one page. We will reuse it or not. 
+      // Simplified loop logic:
 
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
@@ -80,32 +92,85 @@ function App() {
           img.onload = resolve;
         });
 
-        // Calculate aspect ratio to fit in A4
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 10;
-        const maxWidth = pageWidth - (margin * 2);
-        const maxHeight = pageHeight - (margin * 2);
+        // Add page if not first
+        if (i > 0) {
+          if (pdfSettings.pageSize === 'fit') {
+            // For fit, we add page with image dimensions
+            // Convert px to mm roughly for initial sizing or just use pixel units?
+            // jsPDF setPage equivalent or addPage with format
+            // 1px = 0.264583 mm
+            const pxToMm = 0.264583;
+            doc.addPage([img.width * pxToMm, img.height * pxToMm]);
+          } else {
+            doc.addPage(pdfSettings.pageSize);
+          }
+        } else if (pdfSettings.pageSize === 'fit') {
+          // Resize first page
+          const pxToMm = 0.264583;
+          const widthMm = img.width * pxToMm;
+          const heightMm = img.height * pxToMm;
+          // jsPDF doesn't make it easy to resize the FIRST page after init easily without internal access
+          // So we might need to delete first page and add new one, or init with dimensions of first image.
+          // Easier approach: If 'fit', init logic inside loop.
+          // Workaround: set page size
+          doc.deletePage(1);
+          doc.addPage([widthMm, heightMm]);
+        }
 
+
+        let pageWidth = doc.internal.pageSize.getWidth();
+        let pageHeight = doc.internal.pageSize.getHeight();
+
+        let x = 0;
+        let y = 0;
         let imgWidth = img.width;
         let imgHeight = img.height;
-        const ratio = imgWidth / imgHeight;
 
-        if (imgWidth > maxWidth) {
-          imgWidth = maxWidth;
-          imgHeight = imgWidth / ratio;
-        }
+        if (pdfSettings.pageSize === 'fit') {
+          // Image fills page exactly
+          // We work in the page units.
+          // If we defined page size in mm based on pixels, we can draw image to fill it.
+          // Dimensions in doc.addImage should match page dimensions
+          imgWidth = pageWidth;
+          imgHeight = pageHeight;
+        } else {
+          // Standard Size (A4, Letter)
+          let margin = 0;
+          if (pdfSettings.margin === 'small') margin = 10;
+          if (pdfSettings.margin === 'medium') margin = 20;
 
-        if (imgHeight > maxHeight) {
-          imgHeight = maxHeight;
-          imgWidth = imgHeight * ratio;
-        }
+          const maxWidth = pageWidth - (margin * 2);
+          const maxHeight = pageHeight - (margin * 2);
 
-        const x = (pageWidth - imgWidth) / 2;
-        const y = (pageHeight - imgHeight) / 2;
+          const ratio = imgWidth / imgHeight;
 
-        if (i > 0) {
-          doc.addPage();
+          // Convert raw pixels to 'some' reasonable size or just logic:
+          // The image raw width in pixels is likely much larger than the page width in mm.
+          // When we say 'image fills maxWidth', we mean we scale it.
+
+          // Logic: Fit image INTO (maxWidth x maxHeight) keeping aspect ratio.
+
+          // Assume we want to scale usage of mm units:
+          // imgWidth is currently in pixels.
+
+          // We want the final drawn width to be <= maxWidth
+          // finalWidth = maxWidth (if limited by width)
+
+          // Let's reset imgWidth/imgHeight to 'target' display dimensions.
+          // Start by assuming full width
+          let targetWidth = maxWidth;
+          let targetHeight = targetWidth / ratio;
+
+          if (targetHeight > maxHeight) {
+            targetHeight = maxHeight;
+            targetWidth = targetHeight * ratio;
+          }
+
+          imgWidth = targetWidth;
+          imgHeight = targetHeight;
+
+          x = (pageWidth - imgWidth) / 2;
+          y = (pageHeight - imgHeight) / 2;
         }
 
         doc.addImage(img, 'JPEG', x, y, imgWidth, imgHeight);
@@ -189,6 +254,12 @@ function App() {
           </div>
 
           <div className="space-y-8">
+            {images.length > 0 && (
+              <div className="max-w-2xl mx-auto">
+                <PDFSettingsPanel settings={pdfSettings} onSettingsChange={setPdfSettings} />
+              </div>
+            )}
+
             {images.length === 0 ? (
               <div className="max-w-xl mx-auto mt-12 bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/50">
                 <ImageUploader onImagesSelected={handleImagesSelected} />

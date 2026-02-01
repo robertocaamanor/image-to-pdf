@@ -17,6 +17,21 @@
         "errors": {
             "file_type": "Invalid file type. Please upload images.",
             "too_many_files": "Too many files."
+        },
+        "settings": {
+            "title": "PDF Settings",
+            "page_size": {
+                "label": "Page Size",
+                "a4": "A4",
+                "letter": "Letter",
+                "fit": "Fit to Image (No margins)"
+            },
+            "margin": {
+                "label": "Margins",
+                "none": "No margins",
+                "small": "Small (10mm)",
+                "medium": "Normal (20mm)"
+            }
         }
     }
 }
